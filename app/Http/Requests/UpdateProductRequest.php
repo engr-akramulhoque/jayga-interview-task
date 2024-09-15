@@ -22,14 +22,14 @@ class UpdateProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('products.update');
+        $id = $this->route('product');
 
         return [
             'category_id' => 'required|exists:categories,id',
             'name' => ['required', 'max:255', Rule::unique('products', 'name')->ignore($id)],
-            'price' => 'required|numeric',
+            'price' => 'required',
             'quantity' => 'required|integer',
-            'description' => 'required|max:255',
+            'description' => 'nullable|max:255',
         ];
     }
 }

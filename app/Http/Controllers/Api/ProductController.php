@@ -7,7 +7,6 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
@@ -60,7 +59,7 @@ class ProductController extends Controller
     {
         $slug = str()->slug($request->name);
 
-        $product = $product->update(
+        $product->update(
             array_merge(
                 $request->validated(),
                 ['slug' => $slug]
@@ -69,7 +68,8 @@ class ProductController extends Controller
 
         return response()->json([
             'status' => true,
-            'data' => $product != null ? new ProductResource($product) : null,
+            'message' => 'Product updated successfully',
+            'data' => new ProductResource($product),
         ], 200);
     }
 
