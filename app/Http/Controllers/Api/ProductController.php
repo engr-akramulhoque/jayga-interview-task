@@ -7,9 +7,22 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Services\ProductService;
+use App\Traits\ResponseTrait;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
+    use ResponseTrait;
+
+    private $handleProduct;
+
+    public function __construct(ProductService $handleProduct = null)
+    {
+        $this->handleProduct = $handleProduct;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -24,27 +37,11 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProductRequest $request)
+    public function store(StoreProductRequest $request): JsonResponse
     {
-        return $request->all();
+        $product = $this->handleProduct->create($request);
 
-        $slug = str()->slug($request->name);
-
-        $product = Product::create(
-            array_merge(
-                $request->validated(),
-                ['slug' => $slug]
-            )
-        );
-
-        foreach ($request->attributes as $attribute) {
-            $product->attributes()->attach($attribute['id'], ['value' => $attribute['value']]);
-        }
-
-        return response()->json([
-            'status' => true,
-            'data' => new ProductResource($product),
-        ], 201);
+        return $product ? $this->success(new ProductResource($product), 'Product created successfully') : $this->error('Product creation failed');
     }
 
     /**
