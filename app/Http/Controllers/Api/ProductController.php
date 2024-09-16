@@ -10,7 +10,6 @@ use App\Models\Product;
 use App\Services\ProductService;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -58,31 +57,11 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product): JsonResponse
     {
-        $slug = str()->slug($request->name);
+        $product = $this->handleProduct->update($request, $product);
 
-        $product->update(
-            array_merge(
-                $request->validated(),
-                ['slug' => $slug]
-            )
-        );
-
-        // Sync attributes (update pivot table)
-        $attributes = [];
-        foreach ($request->attributes as $attribute) {
-            $attributes[$attribute['id']] = ['value' => $attribute['value']];
-        }
-
-        // Sync the product attributes with the new data
-        $product->attributes()->sync($attributes);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Product updated successfully',
-            'data' => new ProductResource($product),
-        ], 200);
+        return $product ? $this->success(new ProductResource($product), 'Product updated successfully') : $this->error('Product updating failed');
     }
 
     /**
