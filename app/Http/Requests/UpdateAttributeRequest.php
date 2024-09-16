@@ -22,7 +22,7 @@ class UpdateAttributeRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('attributes');
+        $id = $this->route('attribute');
 
         return [
             'name' => 'required',

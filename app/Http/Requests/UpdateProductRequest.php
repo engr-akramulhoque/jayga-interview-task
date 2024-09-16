@@ -30,6 +30,9 @@ class UpdateProductRequest extends FormRequest
             'price' => 'required',
             'quantity' => 'required|integer',
             'description' => 'nullable|max:255',
+            'attributes' => 'required|array',
+            'attributes.*.id' => 'required|exists:attributes,id',
+            'attributes.*.value' => 'required|string|max:255',
         ];
     }
 }
