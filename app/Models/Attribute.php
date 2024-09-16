@@ -11,8 +11,7 @@ class Attribute extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'description'
+        'name'
     ];
 
     public function products(): BelongsToMany

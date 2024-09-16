@@ -14,8 +14,8 @@ class ProductSeeder extends Seeder
     public function run(): void
     {
         // Create attributes (outside the loop)
-        $color = Attribute::create(['attribute' => 'Color']);
-        $size = Attribute::create(['attribute' => 'Size']);
+        $color = Attribute::find(1);
+        $size = Attribute::find(2);
 
         // Define the products array
         $products = [
@@ -23,18 +23,24 @@ class ProductSeeder extends Seeder
                 'category_id' => 1,
                 'name' => 'Smartphones',
                 'slug' => 'smartphones',
+                'price' => 20000,
+                'quantity' => 10,
                 'description' => 'This is a sample smartphone product.'
             ],
             [
                 'category_id' => 2,
                 'name' => 'T-shirts',
                 'slug' => 't-shirts',
+                'price' => 200,
+                'quantity' => 40,
                 'description' => 'This is a sample T-shirt product.'
             ],
             [
                 'category_id' => 3,
                 'name' => 'Refrigerators',
                 'slug' => 'refrigerators',
+                'price' => 30000,
+                'quantity' => 5,
                 'description' => 'This is a sample Refrigerator product.'
             ],
         ];
@@ -45,8 +51,8 @@ class ProductSeeder extends Seeder
 
             // Attach attributes to the product
             $product->attributes()->attach([
-                $color->id => ['value' => 'Red', 'price' => 25.00, 'quantity' => 100],
-                $size->id => ['value' => 'Medium', 'price' => 30.00, 'quantity' => 50],
+                $color->id => ['value' => 'Red'],
+                $size->id => ['value' => 'Medium'],
             ]);
         }
     }
