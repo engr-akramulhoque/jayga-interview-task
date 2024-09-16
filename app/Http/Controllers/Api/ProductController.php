@@ -26,6 +26,8 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
+        return $request->all();
+
         $slug = str()->slug($request->name);
 
         $product = Product::create(
@@ -34,6 +36,10 @@ class ProductController extends Controller
                 ['slug' => $slug]
             )
         );
+
+        foreach ($request->attributes as $attribute) {
+            $product->attributes()->attach($attribute['id'], ['value' => $attribute['value']]);
+        }
 
         return response()->json([
             'status' => true,
@@ -65,6 +71,15 @@ class ProductController extends Controller
                 ['slug' => $slug]
             )
         );
+
+        // Sync attributes (update pivot table)
+        $attributes = [];
+        foreach ($request->attributes as $attribute) {
+            $attributes[$attribute['id']] = ['value' => $attribute['value']];
+        }
+
+        // Sync the product attributes with the new data
+        $product->attributes()->sync($attributes);
 
         return response()->json([
             'status' => true,
