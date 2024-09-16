@@ -16,3 +16,10 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('attributes', AttributeController::class);
     Route::apiResource('products', ProductController::class);
 });
+
+Route::get('test', function () {
+    $product  = \App\Models\Product::find(1)->first()->with('attributes');
+    return $product;
+    $attributes = $product->attributes;
+    return $attributes;
+});
