@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-
 use App\Models\Product;
+use App\Models\Attribute;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
@@ -14,35 +13,41 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create attributes (outside the loop)
+        $color = Attribute::create(['attribute' => 'Color']);
+        $size = Attribute::create(['attribute' => 'Size']);
+
+        // Define the products array
         $products = [
             [
                 'category_id' => 1,
                 'name' => 'Smartphones',
                 'slug' => 'smartphones',
-                'price' => 10000,
-                'quantity' => 10,
                 'description' => 'This is a sample smartphone product.'
             ],
             [
                 'category_id' => 2,
                 'name' => 'T-shirts',
                 'slug' => 't-shirts',
-                'price' => 500,
-                'quantity' => 50,
                 'description' => 'This is a sample T-shirt product.'
             ],
             [
                 'category_id' => 3,
                 'name' => 'Refrigerators',
                 'slug' => 'refrigerators',
-                'price' => 30000,
-                'quantity' => 5,
                 'description' => 'This is a sample Refrigerator product.'
             ],
         ];
 
-        foreach ($products as $product) {
-            Product::create($product);
+        foreach ($products as $productData) {
+            // Create product
+            $product = Product::create($productData);
+
+            // Attach attributes to the product
+            $product->attributes()->attach([
+                $color->id => ['value' => 'Red', 'price' => 25.00, 'quantity' => 100],
+                $size->id => ['value' => 'Medium', 'price' => 30.00, 'quantity' => 50],
+            ]);
         }
     }
 }
