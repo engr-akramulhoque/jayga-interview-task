@@ -79,12 +79,17 @@
 ```bash
     php artisan serve
 ```
+<p>Go to Local Server:
+    <a href="http://127.0.0.1:8000" target="_blank">http://127.0.0.1:8000</a>
+</p>
 
 ### contributions :
 
 <p>
     Akramul Hoque (Software Engineer)<br>
 </p>
+
+<small><a href="https://docs.google.com/document/d/18Avg4GOdZMQL3KQafBglPVGOLyeP4ogrt_8lrXOdUjk/edit?usp=sharing">Read Documentation</a></small>
 
 <span>copyright: <a href="https://github.com/engr-akramulhoque">Engr-Akramul Hoque</a></span>
 
