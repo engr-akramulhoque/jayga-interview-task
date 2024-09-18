@@ -27,7 +27,7 @@ class SearchController extends Controller
             })
             ->get();
 
-        // Return the partial table view
+        // Return the table view
         return view('products.partials.table', compact('products'))->render();
     }
 }

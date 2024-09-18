@@ -647,6 +647,55 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "searching",
+					"item": [
+						{
+							"name": "search product",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8000/api/admin/search/products?t-shirt=color",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"admin",
+										"search",
+										"products"
+									],
+									"query": [
+										{
+											"key": "t-shirt",
+											"value": "color"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}
