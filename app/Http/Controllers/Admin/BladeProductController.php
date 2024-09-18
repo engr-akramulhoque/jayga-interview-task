@@ -81,24 +81,76 @@ class BladeProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product)
+    public function edit($id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $categories = Category::all(['id', 'name']); // Fetch all categories
+        $attributes = Attribute::all(['id', 'name']); // Fetch all attributes
+        $existingAttributes = $product->attributes()->get(); // Get product's existing attributes
+
+        return view('admin.products.edit', [
+            'product' => $product,
+            'categories' => $categories,
+            'attributes' => $attributes, // Pass all attributes to the view
+            'existingAttributes' => $existingAttributes, // Pass product's existing attributes
+        ]);
     }
+
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
-        //
+        // Validate the input
+        $validated = $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'quantity' => 'required|integer',
+            'description' => 'nullable|string',
+            'attributes' => 'array',
+            'attributes.*.id' => 'nullable|exists:attributes,id',
+            'attributes.*.value' => 'nullable|string|max:255',
+        ]);
+        $product = Product::findOrFail($id);
+        if (!$product) {
+            return redirect()->back()->with('error', 'Product not found.');
+        }
+
+        // Update the product's basic fields
+        $product->update([
+            'category_id' => $validated['category_id'],
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']), // Optionally update the slug
+            'price' => $validated['price'],
+            'quantity' => $validated['quantity'],
+            'description' => $validated['description'],
+        ]);
+
+        // Update or attach attributes
+        if (isset($validated['attributes'])) {
+            foreach ($validated['attributes'] as $attributeData) {
+                if (isset($attributeData['value']) && $attributeData['value'] !== null) {
+                    // Update the attribute value if it already exists, otherwise attach
+                    $product->attributes()->syncWithoutDetaching([
+                        $attributeData['id'] => ['value' => $attributeData['value']],
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Product and attributes updated successfully.');
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        //
+        Product::find($id)->delete();
+
+        return to_route('home')->with("success", "Successfully deleted");
     }
 }
