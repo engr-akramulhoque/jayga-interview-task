@@ -22,13 +22,18 @@ class UpdateProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('product');
+        // Retrieve the product ID from either 'product' or 'blade-product' route parameter
+        $id = $this->route('product') ?? $this->route('blade-product');
 
         return [
             'category_id' => 'required|exists:categories,id',
-            'name' => ['required', 'max:255', Rule::unique('products', 'name')->ignore($id)],
-            'price' => 'required',
-            'quantity' => 'required|integer',
+            'name' => [
+                'required',
+                'max:255',
+                Rule::unique('products', 'name')->ignore($id),
+            ],
+            'price' => 'required|numeric',
+            'quantity' => 'required|integer|min:1',
             'description' => 'nullable|max:255',
             'attributes' => 'required|array',
             'attributes.*.id' => 'required|exists:attributes,id',

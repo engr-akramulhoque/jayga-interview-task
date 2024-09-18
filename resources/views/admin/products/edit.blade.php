@@ -1,6 +1,15 @@
 @extends('layouts.layout')
 
 @section('content')
+    @error('errors')
+        <div class="bg-red-500 px-4 py-3 rounded-lg text-sm font-bold text-white mb-4">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @enderror
     <!-- Update form -->
     <div class="bg-white rounded-lg p-6 w-full max-w-lg mx-auto shadow-lg">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Update Product</h3>
@@ -107,7 +116,7 @@
         </form>
     </div>
 
-    <!-- Script to toggle input field based on checkbox status -->
+    <!-- Script to handle checkbox changes and form submission -->
     <script>
         document.querySelectorAll('.attribute-checkbox').forEach(function(checkbox) {
             checkbox.addEventListener('change', function() {
@@ -119,8 +128,28 @@
                     inputWrapper.classList.remove('hidden');
                 } else {
                     inputWrapper.classList.add('hidden');
+                    // Remove the attribute value when the checkbox is unchecked
+                    inputWrapper.querySelectorAll('input').forEach(function(input) {
+                        input.value = '';
+                    });
+                }
+            });
+        });
+
+        // Before submitting the form, remove unchecked attributes
+        document.getElementById('updateProductForm').addEventListener('submit', function(e) {
+            document.querySelectorAll('.attribute-checkbox').forEach(function(checkbox) {
+                var attributeId = checkbox.getAttribute('data-attribute-id');
+                var inputWrapper = document.getElementById('attributeInputWrapper_' + attributeId);
+
+                // If the checkbox is unchecked, remove the corresponding input fields
+                if (!checkbox.checked) {
+                    inputWrapper.querySelectorAll('input').forEach(function(input) {
+                        input.remove();
+                    });
                 }
             });
         });
     </script>
+
 @endsection
