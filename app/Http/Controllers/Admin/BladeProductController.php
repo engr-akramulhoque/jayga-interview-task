@@ -8,6 +8,7 @@ use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -42,25 +43,21 @@ class BladeProductController extends Controller
     {
         $validated = $request->validated();
 
-        $product = Product::create([
-            'category_id' => $validated['category_id'],
-            'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']),
-            'price' => $validated['price'],
-            'quantity' => $validated['quantity'],
-            'description' => $validated['description'],
-        ]);
+        $product = Product::create(array_merge(
+            $validated,
+            ['slug' => Str::slug($validated['name'])]
+        ));
 
-        // Attach attributes
-        if (isset($validated['attributes'])) {
+        // Attach attributes if provided
+        if (!empty($validated['attributes'])) {
             foreach ($validated['attributes'] as $attributeData) {
-                if (isset($attributeData['value']) && $attributeData['value'] !== null) {
-                    $product->attributes()->attach($attributeData['id'], ['value' => $attributeData['value']]);
-                }
+                $product->attributes()->attach($attributeData['id'], [
+                    'value' => $attributeData['value']
+                ]);
             }
         }
 
-        return to_route('home')->with('success', 'Product and attributes saved successfully.');
+        return redirect()->route('home')->with('success', 'Product and attributes saved successfully.');
     }
 
     /**
@@ -77,8 +74,8 @@ class BladeProductController extends Controller
     public function edit($id)
     {
         $product = Product::findOrFail($id);
-        $categories = Category::all(['id', 'name']);
-        $attributes = Attribute::all(['id', 'name']);
+        $categories = Category::get(['id', 'name']);
+        $attributes = Attribute::get(['id', 'name']);
         $existingAttributes = $product->attributes()->get();
 
         return view('admin.products.edit', [
@@ -152,19 +149,16 @@ class BladeProductController extends Controller
      * @return void
      * 
      */
-    protected function attachAttributes($product, $attributes): void
+    protected function attachAttributes($product, $attributes)
     {
-        $syncData = [];
-        if (isset($attributes)) {
+        DB::transaction(function () use ($product, $attributes) {
+            $syncData = [];
             foreach ($attributes as $attributeData) {
                 if (isset($attributeData['id']) && isset($attributeData['value'])) {
-                    // Prepare the data for syncing
                     $syncData[$attributeData['id']] = ['value' => $attributeData['value']];
                 }
             }
-        }
-
-        // Sync the attributes with the product
-        $product->attributes()->sync($syncData);
+            $product->attributes()->sync($syncData);
+        });
     }
 }

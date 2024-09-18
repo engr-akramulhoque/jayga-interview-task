@@ -4,6 +4,15 @@
     @if (Session::has('success'))
         <span class="w-full text-green-500 "> {{ session()->get('success') }}</span>
     @endif
+
+    <!-- Search Form -->
+    <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+        <div class="flex items-center mb-4">
+            <input type="text" id="search" placeholder="Search products..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-md">
+        </div>
+    </div>
+
     <!-- Data Table -->
     <div class="bg-white shadow-md rounded-lg p-6">
         <div class="flex items-center justify-between mb-6">
@@ -15,7 +24,7 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="min-w-full bg-white">
+            <table id="products-table" class="min-w-full bg-white">
                 <thead>
                     <tr class="w-full bg-gray-100 text-left">
                         <th class="py-2 px-4">ID</th>
@@ -28,41 +37,40 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Loop through products -->
-                    @foreach ($products as $item)
-                        <tr class="border-b">
-                            <td class="py-2 px-4">#{{ $item->id }}</td>
-                            <td class="py-2 px-4">{{ $item->name }}</td>
-                            <td class="py-2 px-4">{{ $item->category->name ?? 'Uncategorized' }}</td>
-                            <td class="py-2 px-4">{{ $item->price }}</td>
-                            <td class="py-2 px-4">{{ $item->quantity }}</td>
-
-                            <!-- Loop through attributes -->
-                            <td class="py-2 px-4">
-                                @foreach ($item->attributes as $attributeItem)
-                                    <span
-                                        class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
-                                        {{ $attributeItem->name }}: {{ $attributeItem->pivot?->value }}
-                                    </span>
-                                @endforeach
-                            </td>
-                            <td class=" flex py-2 px-4">
-                                <a href="{{ route('blade-products.edit', ['blade_product' => $item->id]) }}"
-                                    class="text-blue-600 hover:text-blue-800">Edit</a>
-                                <span class="mx-2">|</span>
-                                <form action="{{ route('blade-products.destroy', ['blade_product' => $item->id]) }}"
-                                    method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800"
-                                        onclick="return confirm('Are you sure?')">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
+                    <!-- Content will be loaded here -->
                 </tbody>
             </table>
-
         </div>
     </div>
+@endsection
+
+@section('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function fetchProducts(query = '') {
+                $.ajax({
+                    url: "{{ route('products.search') }}",
+                    method: 'GET',
+                    data: {
+                        query: query
+                    },
+                    success: function(data) {
+                        $('#products-table tbody').html(data);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log('Error:', textStatus, errorThrown);
+                    }
+                });
+            }
+
+            $('#search').on('keyup', function() {
+                let query = $(this).val();
+                fetchProducts(query);
+            });
+
+            // Optional: Initial load
+            fetchProducts();
+        });
+    </script>
 @endsection

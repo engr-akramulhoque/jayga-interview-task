@@ -22,8 +22,7 @@ class UpdateProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        // Retrieve the product ID from either 'product' or 'blade-product' route parameter
-        $id = $this->route('product') ?? $this->route('blade-product');
+        $id = $this->route('product');
 
         return [
             'category_id' => 'required|exists:categories,id',
