@@ -43,7 +43,6 @@ class BladeProductController extends Controller
     {
         $validated = $request->validated();
 
-        // Create the product with validated data and add slug
         $product = Product::create(array_merge(
             $validated,
             ['slug' => Str::slug($validated['name'])]
